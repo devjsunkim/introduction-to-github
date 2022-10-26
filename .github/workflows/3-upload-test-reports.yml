@@ -21,9 +21,6 @@ permissions:
   contents: write
 
 jobs:
-  on_add_test_reporting:
-    name: On add test reporting
-    runs-on: ubuntu-latest
   build:
     runs-on: ubuntu-latest
     steps:
