@@ -21,38 +21,17 @@ permissions:
   contents: write
 
 jobs:
-  on_add_test_reporting:
-    name: On add test reporting
-
-    # We will only run this action when:
-    # 1. This repository isn't the template repository
-    # Reference https://docs.github.com/en/actions/learn-github-actions/contexts
-    # Reference https://docs.github.com/en/actions/learn-github-actions/expressions
-    if: ${{ !github.event.repository.is_template }}
-
-    # We'll run Ubuntu for performance instead of Mac or Windows
+   build:
     runs-on: ubuntu-latest
-
     steps:
-      # We'll need to check out the repository so that we can edit the README
-      - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0 # Let's get all the branches
+      - uses: actions/checkout@v2
 
-      # Verify the learner added actions/upload-artifact
-      - name: Verify workflow
-        run: ./.github/script/check-file.sh
-        env:
-          FILE: .github/workflows/ci.yml
-          SEARCH: actions/upload-artifact
+      - name: Run markdown lint
+        run: |
+          npm install remark-cli remark-preset-lint-consistent
+          npx remark . --use remark-preset-lint-consistent --frail
 
-      # Update README to close <details id=3> and open <details id=4>
-      # and set STEP to '4'
-      - name: Update to step 4
-        uses: skills/action-update-step@v1
+      - uses: actions/upload-artifact@main
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          from_step: 3
-          to_step: 4
-          branch_name: ci
+          name: remark-lint-report
+          path: public/
